@@ -1,11 +1,9 @@
 
 //const {verifyToken} = require('@app/middlewares/auth.middleware.js');
 const {verifyToken} = require('../../src/middlewares');
-
+const db = require("@db");
+const Product = db.product;
 var { Controller} = require("@app/interfaces");
-const DbConnection = require('@db');
-let db = new DbConnection().db;
-
 class ProductController extends Controller{
   constructor() {
     super("/products");
@@ -17,14 +15,15 @@ class ProductController extends Controller{
 
         this.router.get(`${this.path}/viewProduct`,verifyToken, this.ViewProduct);
 
-        this.router.post(`${this.path}/sales`, this.AddSales);
+        //this.router.post(`${this.path}/sales`, this.AddSales);
     }
 
     async AddProduct(req, res) {
         //UserData we get when we decode the token which is in auth.js
-        var userId = req.userData.Id;
+        var UserId = req.userData.Id;
         var {Title, Price} = req.body;
-        await db('tbl_product').insert({Title, Price, user:userId}).then((product_res) => {
+        const data = {Title, Price, UserId};
+        await Product.create(data).then((product_res) => {
             res.status(201).json({
                 message_type:"success",
                 message: `Product Added Successfully!`,
@@ -38,8 +37,8 @@ class ProductController extends Controller{
     }
 
     async ViewProduct(req, res){
-        var userId = req.userData.Id;
-        await db.select().from('tbl_product').where({user:userId}).then((product_res) => {
+        var UserId = req.userData.Id;
+        await Product.findAll({ where: { UserId }}).then((product_res) => {
             if(product_res.length>=1){
                 res.status(201).json({
                     message_type:"success",
@@ -60,7 +59,7 @@ class ProductController extends Controller{
         })
     }
 
-    async AddSales(req, res){
+    /*async AddSales(req, res){
         var {productId, customerId, price, quantity} = req.body;
         await db('tbl_sales').insert({productId, customerId, price, quantity}).then((sales_res) => {
             res.status(201).json({
@@ -73,7 +72,7 @@ class ProductController extends Controller{
                 message:err
             });
         })
-    }
+    }*/
 }
 
 module.exports = ProductController;

@@ -21,12 +21,14 @@
     "knex": "^2.3.0",
     "module-alias": "^2.2.2",
     "nodemon": "^2.0.19",
-    "pg": "^8.8.0"
+    "pg": "^8.8.0",
+    "sequelize": "^6.31.0"
   },
   "_moduleAliases": {
     "@app": "src",
     "@utils": "src/utils",
     "@db": "src/config/db/db",
-    "@routes": "routes"
+    "@routes": "routes",
+    "@models":"src/models"
   }
 }

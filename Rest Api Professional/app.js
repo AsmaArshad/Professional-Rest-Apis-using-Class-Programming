@@ -3,8 +3,8 @@ const cors = require('cors');
 const bodyparser = require('body-parser');
 require("module-alias/register");
 require('dotenv').config();
+const db = require("./src/config/db/db");
 const Port = process.env.Port;
-
 class App {
   constructor( controllers) {
     this.app = express();
@@ -15,7 +15,9 @@ class App {
     this.app.use(bodyparser.json())
     this.initializeMiddlewares();
     this.initializeControllers(controllers);
+    this.syncDatabase();
   }
+
 
    listen() {
     this.app.listen(Port, () => {
@@ -36,6 +38,10 @@ class App {
     controllers.forEach((controller) => {
       this.app.use("/", controller.router);
     });
+  }
+
+  syncDatabase() {
+    db.sequelize.sync().then(() => {});    
   }
 }
 

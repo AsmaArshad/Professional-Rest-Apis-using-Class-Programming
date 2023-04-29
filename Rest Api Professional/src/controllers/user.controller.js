@@ -1,12 +1,12 @@
-
 const {checkEmailExists, authenticateUser, checkCustomerEmailExists} = require('@app/middlewares/validation.middleware.js');
+const db = require("@db");
+const User = db.user;
+const Customer = db.customer;
 
 var { Controller} = require("@app/interfaces");
 const bcrypt = require('bcrypt');
 const utils = require("@utils/token.js");
 const password = require("@utils/passwordHash.js");
-const DbConnection = require('@db');
-let db = new DbConnection().db;
 
 class UserController extends Controller{
   constructor() {
@@ -30,13 +30,14 @@ class UserController extends Controller{
       {
           let hashPassword = await password.generateHashPswd(Password, 10);
           if(hashPassword != undefined){
-              await db('tbl_user').insert({ Name, Email, Password: hashPassword}).then((user_res) => {
+            const data = { Name, Email, Password: hashPassword};
+            await User.create(data).then((user_res) => {
                   return res.status(201).json({
                       message_type:"success",
                       message: "User Registered Successfully!",
                   })
-              })
-              .catch((err)=> {
+            })
+            .catch((err)=> {
                   res.json(err.message);
               })
           }
@@ -80,11 +81,12 @@ class UserController extends Controller{
           let hashPassword = await password.generateHashPswd(Password, 10);
           if(hashPassword != undefined)
           { 
-              await db('tbl_customer').insert({ Name, Email, Password: hashPassword}).then((customer_res) => {
-                  return res.status(201).json({
+            const data = { Name, Email, Password: hashPassword}
+            await Customer.create(data).then((customer_res) => {
+                return res.status(201).json({
                       message_type:"success",
                       message: "Customer Added Successfully!",     
-                  })
+                })
               })
               .catch((err)=> {
                   res.json(err.message);
@@ -92,7 +94,6 @@ class UserController extends Controller{
           }
       }
   }
-  
 }
 
 module.exports = UserController;
